@@ -12,8 +12,12 @@ namespace Numerals
         static void Main(string[] args)
         {
             Console.WriteLine("Enter a number based on roman numerals");
-            string romanNumeral = Console.ReadLine();
+            string romanNumeral = (Console.ReadLine()).ToUpper();
             Console.WriteLine("Your roman numerals translate to: " + EvaluateRoman(romanNumeral) + " in arabic numerals");
+            Console.WriteLine("Enter a number based on arabic numerals");
+            int arabicNumber = Int32.Parse(Console.ReadLine());
+            Console.WriteLine(arabicNumber);
+            Console.WriteLine(EvaluateArabic(arabicNumber));
             Console.ReadKey();
         }
 
@@ -77,32 +81,86 @@ namespace Numerals
                 string rightSide = "";
                 if(positionOfLargestValue != 0)
                 {
-                    leftSide = section.Substring(0, positionOfLargestValue + 1);
+                    leftSide = section.Substring(0, positionOfLargestValue);
                 }
                 if(positionOfLargestValue != section.Length - 1)
                 {
-                    rightSide = section.Substring(positionOfLargestValue + 1, section.Length - (positionOfLargestValue + 1));
+                    rightSide = section.Substring(positionOfLargestValue + 1);
                 }
                 return RomanToArabic(section[positionOfLargestValue]) - EvaluateRoman(leftSide) + EvaluateRoman(rightSide);
+                
             }
-            return RomanToArabic(section[0]);
+            else if(section.Length == 0)
+            {
+                return 0;
+            }
+            return RomanToArabic(section[positionOfLargestValue]);
         }
 
         static int FindLargestNumberPosition(string section)
         {
             int positionOfLargestValue = 0;
             int largestValue = 0;
-            for (int x = 0; x > section.Length; x++)
+            for (int x = 0; x < section.Length; x++)
             {
-                if (section[x] > largestValue)
+                if (RomanToArabic(section[x]) > largestValue)
                 {
                     positionOfLargestValue = x;
-                    largestValue = section[x];
+                    largestValue = RomanToArabic(section[x]);
                 }
             }
             return positionOfLargestValue;
         }
 
+        static string EvaluateArabic(int currentNumber)
+        {
+            int closestNumber = ClosestNumber(currentNumber);
+            int nextNumber = currentNumber - closestNumber;
+            if(nextNumber > 0)
+            {
+                return ArabicToRomam(closestNumber) + EvaluateArabic(Math.Abs(nextNumber));
+            }
+            else if(nextNumber < 0)
+            {
+                return EvaluateArabic(Math.Abs(nextNumber)) + ArabicToRomam(closestNumber);
+            }
+            return ArabicToRomam(closestNumber);
+        }
 
+        static int ClosestNumber(int number)
+        {
+            int closestValue = 0;
+            int[] arabic = { 1, 5, 10, 50, 100, 500, 1000 };
+            for(int x = 0; x < arabic.Length; x++)
+            {
+                if (Math.Abs(number - arabic[x]) < Math.Abs(number - arabic[closestValue]))
+                {
+                    closestValue = x;
+                }
+            }
+            return arabic[closestValue];
+        }
+
+        static string ArabicToRomam(int number)
+        {
+            switch(number)
+            {
+                case 1:
+                    return "I";
+                case 5:
+                    return "V";
+                case 10:
+                    return "X";
+                case 50:
+                    return "L";
+                case 100:
+                    return "C";
+                case 500:
+                    return "D";
+                case 1000:
+                    return "M";
+            }
+            return "";
+        }
     }
 }
